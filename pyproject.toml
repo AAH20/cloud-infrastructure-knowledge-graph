@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cloud-infrastructure-knowledge-graph"
+version = "0.1.0"
+description = "Multi-cloud infrastructure knowledge graph and digital twin"
+requires-python = ">=3.11"
+license = {text = "Apache-2.0"}
+
+[project.scripts]
+cloudgraph = "cloudgraph.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["cloudgraph*"]

@@ -1,0 +1,28 @@
+{
+  "snapshot_id": "synthetic-commerce-2026-09-05T12:00:00Z",
+  "graph_freshness_seconds": 45,
+  "nodes": [
+    {"id": "business:checkout", "kind": "business_service", "name": "Checkout", "source": "backstage", "observed_at": "2026-09-05T12:00:00Z", "attributes": {"owner": "commerce-team", "monthly_revenue_usd": 420000}},
+    {"id": "app:checkout-api", "kind": "application", "name": "Checkout API", "source": "backstage", "observed_at": "2026-09-05T12:00:00Z", "attributes": {"owner": "commerce-team", "slo": "99.95"}},
+    {"id": "k8s:prod/checkout", "kind": "kubernetes_workload", "name": "checkout", "source": "kubernetes", "observed_at": "2026-09-05T12:00:00Z", "attributes": {"owner": "commerce-team", "monthly_cost_usd": 3100, "declared": {"replicas": 3}, "observed": {"replicas": 2}}},
+    {"id": "azure:aks-prod", "kind": "azure_resource", "name": "aks-prod", "source": "azure-resource-graph", "observed_at": "2026-09-05T11:59:30Z", "attributes": {"owner": "platform-team", "monthly_cost_usd": 8400}},
+    {"id": "azure:postgres-orders", "kind": "database", "name": "postgres-orders", "source": "azure-resource-graph", "observed_at": "2026-09-05T11:59:30Z", "attributes": {"owner": "data-team", "monthly_cost_usd": 2650}},
+    {"id": "azure:private-endpoint-postgres", "kind": "azure_resource", "name": "pe-postgres", "source": "azure-resource-graph", "observed_at": "2026-09-05T11:59:30Z", "attributes": {"monthly_cost_usd": 15}},
+    {"id": "azure:private-dns-postgres", "kind": "azure_resource", "name": "privatelink.postgres.database.azure.com", "source": "azure-resource-graph", "observed_at": "2026-09-05T11:59:30Z", "attributes": {"owner": "network-team", "monthly_cost_usd": 2}},
+    {"id": "identity:checkout", "kind": "managed_identity", "name": "mi-checkout", "source": "entra", "observed_at": "2026-09-05T11:58:00Z", "attributes": {"owner": "commerce-team"}},
+    {"id": "azure:keyvault-commerce", "kind": "azure_resource", "name": "kv-commerce", "source": "azure-resource-graph", "observed_at": "2026-09-05T11:59:30Z", "attributes": {"owner": "security-platform", "monthly_cost_usd": 18}},
+    {"id": "terraform:checkout-module", "kind": "iac_module", "name": "checkout-platform", "source": "terraform-state", "observed_at": "2026-09-05T11:55:00Z", "attributes": {"owner": "platform-team"}},
+    {"id": "orphan:disk-17", "kind": "azure_resource", "name": "disk-17", "source": "azure-resource-graph", "observed_at": "2026-09-05T11:59:30Z", "attributes": {"monthly_cost_usd": 96}}
+  ],
+  "edges": [
+    {"source": "business:checkout", "target": "app:checkout-api", "relation": "depends_on", "evidence": "backstage:component/checkout-api", "observed_at": "2026-09-05T12:00:00Z"},
+    {"source": "app:checkout-api", "target": "k8s:prod/checkout", "relation": "runs_as", "evidence": "kubernetes:deployment/prod/checkout", "observed_at": "2026-09-05T12:00:00Z"},
+    {"source": "k8s:prod/checkout", "target": "azure:aks-prod", "relation": "runs_on", "evidence": "kubernetes:node-provider-id", "observed_at": "2026-09-05T12:00:00Z"},
+    {"source": "k8s:prod/checkout", "target": "azure:postgres-orders", "relation": "calls", "evidence": "otel:servicegraph/checkout-postgres", "observed_at": "2026-09-05T11:59:50Z"},
+    {"source": "azure:postgres-orders", "target": "azure:private-endpoint-postgres", "relation": "exposed_by", "evidence": "azure:privateLinkServiceConnections", "observed_at": "2026-09-05T11:59:30Z"},
+    {"source": "azure:private-endpoint-postgres", "target": "azure:private-dns-postgres", "relation": "resolves_through", "evidence": "azure:privateDnsZoneGroup", "observed_at": "2026-09-05T11:59:30Z"},
+    {"source": "k8s:prod/checkout", "target": "identity:checkout", "relation": "authenticates_as", "evidence": "entra:federatedIdentityCredential", "observed_at": "2026-09-05T11:58:00Z"},
+    {"source": "identity:checkout", "target": "azure:keyvault-commerce", "relation": "can_access", "evidence": "azure:roleAssignment/secret-reader", "observed_at": "2026-09-05T11:58:00Z"},
+    {"source": "terraform:checkout-module", "target": "k8s:prod/checkout", "relation": "declares", "evidence": "terraform:state/checkout", "observed_at": "2026-09-05T11:55:00Z"}
+  ]
+}
